@@ -1,0 +1,28 @@
+{
+  "name": "e-commerce-api",
+  "version": "1.0.0",
+  "description": "E-Commerce platform with cart and payment gateway integration.",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev" : "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kxng0109/node-E-Commerce-API.git"
+  },
+  "author": "Joshua Ike",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kxng0109/node-E-Commerce-API/issues"
+  },
+  "homepage": "https://github.com/kxng0109/node-E-Commerce-API#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.14.0"
+  }
+}
