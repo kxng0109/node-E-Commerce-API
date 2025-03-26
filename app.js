@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import express from "express";
+import authRoute from "./routes/auth.route.js";
 import productRoute from "./routes/products.route.js";
 config();
 
@@ -8,13 +9,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use("/api/v1/")
+app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/", productRoute);
 
 app.use((err, req, res, next) =>{
 	console.error(err.stack);
 	console.log(err)
-	res.status(500).send()
+	res.status(500).json(err)
 })
 
 app.listen(PORT, () => {

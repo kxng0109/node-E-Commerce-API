@@ -9,8 +9,6 @@ const pool = createPool({
 	database: "e_commerce",
 });
 
-console.log("right here!")
-
 if (!process.env.MYSQL_HOST || !process.env.MYSQL_USER) {
 	throw new Error(
 		"Invalid SQL credentials. Please ensure the right credentials specified in your .env file.",

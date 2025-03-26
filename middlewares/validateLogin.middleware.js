@@ -1,24 +1,22 @@
-import { isEmail, isLength } from "validator";
+import validator from "validator";
 
 const validateLogin = async(req, res, next) =>{
 	try{
 		const {email, password} = req.body;
 		if(!email || !password){
+			res.send("Required fields can not be empty.")
 			throw new Error("Required fields can not be empty.")
 		};
 
-		if(!isLength(password, {min: 8})){
-			throw new Error("Password can not be less than eight characters.")
+		if(!validator.isLength(password, {min: 8})){
+			res.send("Password can not be less than eight characters.")
+			throw new Error("Password can not be less than eight(8) characters.")
 		};
 
-		if(!isEmail(email, {allow_underscores: true})){
+		if(!validator.isEmail(email, {allow_underscores: true})){
+			res.send("Invalid email address.")
 			throw new Error("Invalid email address.")
 		};
-		
-		const user = findUserFromDB(email);
-		if(!user || !user.length){
-			throw new Error("User with email not found.")
-		}
 
 		req.user = {email, password};
 		next();
