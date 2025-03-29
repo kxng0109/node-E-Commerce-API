@@ -51,7 +51,7 @@ export const registerController = async (req, res, next) => {
 		const token = await generateJWT({ id, first_name, last_name, email });
 
 		res.status(StatusCodes.CREATED).json({
-			message: `Welcome ${last_name} ${first_name}.`,
+			message: `Registeration successful. Welcome ${last_name} ${first_name}.`,
 			token,
 		});
 	} catch (err) {
