@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { registerUser } from "../db/auth.db.js";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors/index.js";
 import comparePassword from "../utils/comaprePassword.util.js";
 import hashPassword from "../utils/hashPassword.util.js";
 import generateJWT from "../utils/signJWT.util.js";
@@ -8,14 +9,12 @@ export const loginController = async (req, res, next) => {
 	try {
 		const { password, emailExists, userDetails } = req.user; //Gotten from the validateLogin middleware
 		if (!emailExists) {
-			res.send("User with email not found.");
-			throw new Error("User with email not found.");
+			throw new NotFoundError("User with email not found.");
 		}
 
 		const match = await comparePassword(password, userDetails.password);
 		if (!match) {
-			res.send("Incorrect credentials.");
-			throw new Error("Incorrect credentials.");
+			throw new BadRequestError("Incorrect credentials.");
 		}
 
 		const { id, first_name, last_name, email } = userDetails;
@@ -35,8 +34,7 @@ export const registerController = async (req, res, next) => {
 		const { email, password, first_name, last_name, emailExists } = req.user; //Gotten from the validateRegister middleware
 
 		if (emailExists) {
-			res.send("User with this email exists.");
-			throw new Error("User with this email exists.");
+			throw new ConflictError("User with this email exists.");
 		}
 
 		const hashedPassword = await hashPassword(password);

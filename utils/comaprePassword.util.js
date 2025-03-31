@@ -4,7 +4,7 @@ const comparePassword = async (givenPassword, hashedPassword) => {
 	try {
 		const match = await compare(givenPassword, hashedPassword);
 		if (!match) {
-			throw new Error("Incorrect credentials");
+			throw new Error("Incorrect credentials. ");
 		}
 		return match;
 	} catch (err) {

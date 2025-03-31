@@ -1,8 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import { getProduct, getProducts } from "../db/products.db.js";
+import { BadRequestError, NotFoundError } from "../errors/index.js";
 
 //Get all products
-export const viewProducts = async(req, res, err) =>{
+export const viewProducts = async(req, res, next) =>{
 	try{
 		const products = await getProducts();
 		res.status(StatusCodes.OK).json(products)
@@ -16,14 +17,12 @@ export const viewProduct = async(req, res, next) =>{
 	try{
 		const {productName} = req.params;
 		if(!productName){
-			next("Product name required", StatusCodes.BAD_REQUEST);
-			return;
+			throw new BadRequestError("Product name required.")
 		};
 
 		const product = await getProduct(productName);
 		if(!product){
-			// return next("No product found with such name!", StatusCodes.NOT_FOUND)
-			res.status(StatusCodes.NOT_FOUND).json("Not found.")
+			throw new NotFoundError("Product with such name not found.")
 		}
 		res.status(StatusCodes.OK).json(product);
 	}catch(err){

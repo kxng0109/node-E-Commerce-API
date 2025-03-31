@@ -6,11 +6,9 @@ const checkUserExist = async (req, _res, next) => {
 		const user = await findUserFromDB(email);
 		if (!user || !user.email) {
 			req.user = { ...req.user, emailExists: false };
-			next();
-			return;
+		} else{
+			req.user = { ...req.user, emailExists: true, userDetails: user };
 		}
-
-		req.user = { ...req.user, emailExists: true, userDetails: user };
 		next();
 	} catch (err) {
 		next(err);
