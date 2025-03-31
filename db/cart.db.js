@@ -1,32 +1,9 @@
 import pool from "./dbConnect.js";
 
-export const checkTable = async () => {
+const checkTable = async () => {
 	try {
 		const [rows] = await pool.execute('SHOW TABLES LIKE cart_items');
 		return rows.length ? true : false;
-	} catch (err) {
-		throw new Error(err);
-	}
-};
-
-export const createCart = async () => {
-	try {
-		const [result] = await pool.execute(`
-			CREATE TABLE cart_items (
-			id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	    	user_id INT UNSIGNED NOT NULL,
-			product_id INT UNSIGNED NOT NULL,
-			quantity INT UNSIGNED NOT NULL DEFAULT 1,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
-			CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES products(id),
-			UNIQUE KEY uniq_user_product (user_id, product_id),
-			INDEX idx_user_id (user_id),
-			INDEX idx_product_id (product_id)
-			`);
-		console.log(result);
-		return checkCart(cart_name);
 	} catch (err) {
 		throw new Error(err);
 	}
