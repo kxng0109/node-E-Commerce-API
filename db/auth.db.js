@@ -3,7 +3,6 @@ import pool from "./dbConnect.js";
 export const findUser = async(email) =>{
 	try{
 		const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
-		console.log(rows[0])
 		return rows[0];
 	} catch(err){
 		throw new Error(err.message)

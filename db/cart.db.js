@@ -1,37 +1,30 @@
 import pool from "./dbConnect.js";
 
-export const checkCart = async (cart_name) => {
+export const checkTable = async () => {
 	try {
-		//Apparently, placeholders in prepared statements work well for values, but they won't work for table names or column names
-		const escapedTableName = pool.escape(cart_name);
-		const query = `SHOW TABLES LIKE ${escapedTableName}`;
-		const [rows] = await pool.execute(query);
-		// console.log(rows)
+		const [rows] = await pool.execute('SHOW TABLES LIKE cart_items');
 		return rows.length ? true : false;
 	} catch (err) {
-		// console.log(err)
 		throw new Error(err);
 	}
 };
 
-export const createCart = async (cart_name) => {
+export const createCart = async () => {
 	try {
-		const table = pool.escapeId(cart_name);
-		console.log(table)
-		const query = `
-		CREATE TABLE ${table} (
-		id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    	user_id INT UNSIGNED NOT NULL,
-		product_id INT UNSIGNED NOT NULL,
-		quantity INT UNSIGNED NOT NULL DEFAULT 1,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
-		CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES products(id),
-		INDEX idx_user_id (user_id),
-		INDEX idx_product_id (product_id)
-			);`
-		const [result] = await pool.execute(query);
+		const [result] = await pool.execute(`
+			CREATE TABLE cart_items (
+			id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	    	user_id INT UNSIGNED NOT NULL,
+			product_id INT UNSIGNED NOT NULL,
+			quantity INT UNSIGNED NOT NULL DEFAULT 1,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
+			CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES products(id),
+			UNIQUE KEY uniq_user_product (user_id, product_id),
+			INDEX idx_user_id (user_id),
+			INDEX idx_product_id (product_id)
+			`);
 		console.log(result);
 		return checkCart(cart_name);
 	} catch (err) {
@@ -39,83 +32,89 @@ export const createCart = async (cart_name) => {
 	}
 };
 
-//Check if the item is actually in the cart
-export const findItemInCart = async(cart_name, product_id) =>{
+//Get everything in the user's cart
+export const getUserCart = async (user_id) => {
 	try {
-		//Apparently, placeholders in prepared statements work well for values, but they won't work for table names or column names
-		const table = pool.escapeId(cart_name);
-		const query = `SELECT product_id FROM ${table} WHERE product_id = ?`;
+		const [rows] = await pool.execute(
+			`SELECT * FROM cart_items WHERE user_id = ?`,
+			[user_id],
+		);
+		return rows.length ? rows : null;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
 
-		const [rows] = await pool.execute(query, [product_id]);
+//Get specific thing in users cart. It's an internal function
+const getUserItemInCart = async (cart_id) => {
+	try {
+		const [rows] = await pool.execute(
+			`SELECT * FROM cart_items WHERE id = ?`,
+			[cart_id],
+		);
+		return rows[0];
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+//Check product in user's cart
+export const getProductFromCart = async(product_id, user_id) =>{
+	try {
+		const [rows] = await pool.execute(
+			`SELECT * FROM cart_items WHERE product_id = ? AND user_id = ?`,
+			[product_id, user_id],
+		);
 		return rows.length ? rows[0] : null;
 	} catch (err) {
 		throw new Error(err);
 	}
-};
+}
 
-export const getCartItemProperty = async (key, cart_name, product_id) => {
+//Yeah
+export const addItemToCart = async (user_id, product_id, quantity) => {
 	try {
-		const result = await findItemInCart(cart_name, product_id);
-		return result ? result[key] : null;
+		const [result] = await pool.execute(
+			`INSERT INTO cart_items(user_id, product_id, quantity) VALUES(?, ?, ?)`,
+			[user_id, product_id, quantity],
+		);
+		const row = await getUserItemInCart(result.insertId);
+		return row;
 	} catch (err) {
 		throw new Error(err);
 	}
 };
 
-export const addToCart = async (cart_name, product_id, quantity) => {
+export const updateItemInCart = async(user_id, product_id, quantity) =>{
+	try{
+		const [result] = await pool.execute("UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?", [quantity, user_id, product_id]);
+		return result.affectedRows ? await getProductFromCart(product_id, user_id) : null;
+	}catch(err){
+		throw new Error(err);
+	}
+}
+
+//Delete an item from the user cart
+export const deleteFromCart = async (product_id, user_id) => {
 	try {
-		const table = pool.escapeId(cart_name);
-		const query = `INSERT INTO ${table} (product_id, quantity) VALUES(?, ?)`;
-		const [result] = await pool.execute(query, [
-			product_id,
-			quantity
+		await pool.execute(
+			"DELETE FROM cart_items WHERE product_id = ? AND user_id = ?",
+			[product_id, user_id],
+		);
+		const rows = await getUserCart(user_id);
+		return rows;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+//Delete everything in the user's cart
+export const clearCart = async (user_id) => {
+	try {
+		await pool.execute("DELETE FROM cart_items WHERE user_id = ?", [
+			user_id,
 		]);
-		return result;
-	} catch (err) {
-		throw new Error(err);
-	}
-};
-
-export const incrementItemQuantity = async (cart_name, product_id) => {
-	try {
-		const [result] = await pool.execute(
-			"UPDATE ? SET quantity=quantity + 1 WHERE product_id = ?",
-			[cart_name, product_id],
-		);
-		return result;
-	} catch (err) {
-		throw new Error(err);
-	}
-};
-
-export const decrementItemQuantity = async (cart_name, product_id) => {
-	try {
-		const [result] = await pool.execute(
-			"UPDATE ? SET quantity=quantity - 1 WHERE product_id = ?",
-			[cart_name, product_id],
-		);
-		return result;
-	} catch (err) {
-		throw new Error(err);
-	}
-};
-
-export const deleteItemFromCart = async (cart_name, product_id) => {
-	try {
-		const [result] = await pool.execute(
-			"DELETE FROM ? WHERE product_id = ?",
-			[cart_name, product_id],
-		);
-		return result;
-	} catch (err) {
-		throw new Error(err);
-	}
-};
-
-export const clearCart = async (cart_name) => {
-	try {
-		const [result] = await pool.execute("DELETE FROM ?", [cart_name]);
-		return result;
+		return true;
 	} catch (err) {
 		throw new Error(err);
 	}
