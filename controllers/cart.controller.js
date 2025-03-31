@@ -8,6 +8,7 @@ import {
     updateItemInCart,
 } from "../db/cart.db.js";
 import { BadRequestError, NotFoundError } from "../errors/index.js";
+import checkProductExists from "../utils/checkProductExists.util.js";
 
 export const getCartItemsController = async (req, res, next) => {
 	try {
@@ -33,7 +34,10 @@ export const addToCartController = async (req, res, next) => {
 
 		if (Number(product_id) === NaN || Number(quantity) === NaN) {
 			throw new BadRequestError("Invalid product ID or quantity.");
-		}
+		};
+
+		const exists = await checkProductExists(product_id);
+		if(!exists) throw new NotFoundError("Product does not exists.");
 
 		const cart = await getProductFromCart(product_id, user_id);
 		if (!cart) {
@@ -63,6 +67,9 @@ export const updateCartController = async (req, res, next) => {
 			throw new BadRequestError("Invalid product ID or quantity.");
 		}
 
+		const exists = await checkProductExists(productID);
+		if(!exists) throw new NotFoundError("Product does not exists.");
+
 		const cart = await updateItemInCart(user_id, productID, quantity);
 		if (!cart) {
 			throw new NotFoundError("Product is not in your cart. ");
@@ -90,6 +97,9 @@ export const deleteFromCartController = async (req, res, next) => {
 			throw new BadRequestError("Invalid product ID.");
 		}
 
+		const exists = await checkProductExists(productID);
+		if(!exists) throw new NotFoundError("Product does not exists.");
+
 		const isInCart = await getProductFromCart(productID, user_id);
 		if (!isInCart) {
 			throw new NotFoundError("Product not found in your cart.");
@@ -97,7 +107,7 @@ export const deleteFromCartController = async (req, res, next) => {
 
 		await deleteFromCart(productID, user_id);
 		res.status(StatusCodes.OK).json({
-			message: "Product removed from your cart. ",
+			message: "Product removed from your cart.",
 		});
 	} catch (err) {
 		next(err);

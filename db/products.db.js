@@ -14,8 +14,17 @@ export const getProducts = async() =>{
 export const getProduct = async(name) =>{
 	try{
 		const [rows] = await pool.execute('SELECT * FROM products WHERE name = ?', [name]);
-		return rows[0];
+		return rows.length ? rows[0] : null;
 	} catch(err){
+		return err;
+	}
+}
+
+export const getProductById = async(product_id) =>{
+	try{
+		const [rows] = await pool.execute('SELECT * FROM products WHERE id = ?', [product_id]);
+		return rows.length ? rows[0] : null;
+	}catch{
 		return err;
 	}
 }
