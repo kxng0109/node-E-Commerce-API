@@ -22,7 +22,7 @@ import pool from "./db/dbConnect.js";
 				name VARCHAR(255) NOT NULL,
 				brand VARCHAR(100) NOT NULL,
 				description TEXT NOT NULL,
-				image_url VARCHAR(2083),
+				image_url JSON NOT NULL,
 				price DECIMAL(10,2) NOT NULL,
 				stock_quantity INT UNSIGNED DEFAULT 0,
 				created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

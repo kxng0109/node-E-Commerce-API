@@ -32,7 +32,7 @@ export const addToCartController = async (req, res, next) => {
 			throw new BadRequestError("Product ID and quantity needed.");
 		}
 
-		if (Number(product_id) === NaN || Number(quantity) === NaN) {
+		if (Number(product_id) === NaN || Number(quantity) === NaN || Number(quantity) <= 0) {
 			throw new BadRequestError("Invalid product ID or quantity.");
 		};
 
@@ -63,7 +63,7 @@ export const updateCartController = async (req, res, next) => {
 			throw new BadRequestError("Product ID and quantity needed.");
 		}
 
-		if (Number(productID) === NaN || Number(quantity) === NaN) {
+		if (Number(productID) === NaN || Number(quantity) === NaN || Number(quantity) <= 0) {
 			throw new BadRequestError("Invalid product ID or quantity.");
 		}
 

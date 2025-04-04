@@ -7,7 +7,8 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 			.status(err.statusCode)
 			.json({ message: err.message, errCode: err.statusCode });
 	}
-	console.log(err);
+
+	console.error(err);
 	return res
 		.status(StatusCodes.INTERNAL_SERVER_ERROR)
 		.json({ message: "An error occured." });

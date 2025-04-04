@@ -7,7 +7,7 @@ config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const stripe_base_url = "https://api.stripe.com";
 
-const handlePayout = async (cart) => {
+const handlePayout = async (cart, user_id) => {
 	const products = await getProducts();
 	const productsMap = new Map();
 	products.map((item) => {
@@ -15,6 +15,7 @@ const handlePayout = async (cart) => {
 			name: item.name,
 			brand: item.brand,
 			description: item.description,
+			image: item.image_url,
 			price: Math.round(item.price * 100),
 		});
 	});
@@ -22,16 +23,13 @@ const handlePayout = async (cart) => {
 	const session = await stripe.checkout.sessions.create({
 		line_items: cart.map((item) => {
 			const product = productsMap.get(item.product_id);
-			console.log(product.price)
 			return {
 				price_data: {
-					currency: "NGN",
+					currency: "ngn",
 					product_data: {
 						name: product.name,
-						description: product.description || "test",
-						images: product.image_url
-							? [product.image_url]
-							: ["test"],
+						description: product.description,
+						images: product.image.length > 1 ? [product.image[0], product.image[1]] : [product.image[0]]
 					},
 					unit_amount: product.price,
 				},
@@ -39,7 +37,13 @@ const handlePayout = async (cart) => {
 			};
 		}),
 		mode: "payment",
-		success_url: `http://localhost:3000/success.html`,
+		payment_intent_data:{
+			metadata: {
+				customerID: user_id,
+			},
+		},
+		success_url: `${process.env.SERVER_URL}/success.html`,
+		cancel_url: `${process.env.SERVER_URL}/cancel.html`,
 		payment_method_types: ["card"]
 	});
 	return session;
