@@ -4,7 +4,7 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Swagger](https://img.shields.io/badge/docs-swagger-blue)](swagger.yaml)
 
-A **RESTful E-Commerce API** built with Node.js and Express, featuring user authentication, product management, shopping cart functionality, and Stripe payment integration. This API is designed to serve as the backend for e-commerce applications, providing secure endpoints for users, products, carts, and checkout workflows.
+A **RESTful E-Commerce API** built with Node.js and Express, featuring user authentication, product management, shopping cart functionality, and Stripe payment integration. This API is designed to serve as the backend for e-commerce applications, providing secure endpoints for users, products, carts, and checkout workflows. Project idea gotten from [here](https://roadmap.sh/projects/ecommerce-api).
 
 ---
 
