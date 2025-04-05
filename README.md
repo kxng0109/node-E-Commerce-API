@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![Swagger](https://img.shields.io/badge/docs-swagger-blue)](swagger.yaml)
 
 A **RESTful E-Commerce API** built with Node.js and Express, featuring user authentication, product management, shopping cart functionality, and Stripe payment integration. This API is designed to serve as the backend for e-commerce applications, providing secure endpoints for users, products, carts, and checkout workflows.
 
@@ -19,8 +20,8 @@ A **RESTful E-Commerce API** built with Node.js and Express, featuring user auth
 - [API Documentation](#api-documentation)
 - [API Endpoints](#api-endpoints)
 - [Error Handling](#error-handling)
-- [Security & Middleware](#-security--middleware)  
-- [Project Structure](#project-structure)\
+- [Security & Middleware](#-security--middleware)
+- [Project Structure](#project-structure)
 - [License](#license)
 - [Contact](#contact)
 
@@ -165,7 +166,7 @@ You can explore all endpoints, view request/response schemas, and test directly 
 
 ## API Endpoints
 
-For detailed request and response schemas for all endpoints, please navigate to the [Swagger UI](http://localhost:<PORT>/api/v1/api-docs).
+For detailed request and response schemas for all endpoints, please navigate to the [Swagger UI](http://localhost:<PORT>/api/v1/api-docs). Change <PORT> to the server's port.
 
 ### Authentication
 
@@ -229,10 +230,10 @@ We use:
 node-E-Commerce-API/
 ├── controllers/          # Logic for handling route requests
 ├── middlewares/          # Custom middleware functions
-├── public/          # Success URL for stripe
-├── errors/          # Custom errors
-├── services/          # Contains stripe service
-├── db/               # Database queries and interactions
+├── public/               # Success URL for stripe
+├── errors/               # Custom errors
+├── services/             # Contains stripe service
+├── db/                   # Database queries and interactions
 ├── routes/               # Route definitions and bindings
 ├── utils/                # Utility/helper functions
 ├── setupDatabases.js     # DB setup script
