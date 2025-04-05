@@ -3,7 +3,13 @@ import { BadRequestError, UnprocessableEntityError } from "../errors/index.js";
 
 const validateRegister = async (req, res, next) => {
 	try {
-		const { email, password, first_name, last_name } = req.body;
+		const {
+			email,
+			password,
+			first_name,
+			last_name,
+			role = "customer",
+		} = req.body;
 		if (!email || !password || !first_name || !last_name) {
 			throw new BadRequestError("Required fields can not be empty.");
 		}
@@ -14,8 +20,10 @@ const validateRegister = async (req, res, next) => {
 			);
 		}
 
-		if(!validator.isStrongPassword(password)){
-			throw new UnprocessableEntityError("Password must contain at least one uppercase letter, one lowercase letter, one symbol and must not be less than eight (8) characters");
+		if (!validator.isStrongPassword(password)) {
+			throw new UnprocessableEntityError(
+				"Password must contain at least one uppercase letter, one lowercase letter, one symbol and must not be less than eight (8) characters",
+			);
 		}
 
 		if (!validator.isAlpha(first_name) || !validator.isAlpha(last_name)) {
@@ -37,7 +45,13 @@ const validateRegister = async (req, res, next) => {
 			throw new BadRequestError("Invalid email address.");
 		}
 
-		req.user = { email, password, first_name, last_name };
+		const availableRoles = ["admin", "customer"];
+
+		if (role && !availableRoles.includes(role)) {
+			throw new BadRequestError("Invalid role.");
+		}
+
+		req.user = { email, password, first_name, last_name, role };
 		next();
 	} catch (err) {
 		next(err);

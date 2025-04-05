@@ -35,6 +35,35 @@ export const getProductById = async (product_id) => {
 	}
 };
 
+export const createProduct = async (
+	name,
+	brand,
+	description,
+	image_url,
+	price,
+	stock_quantity,
+	available,
+) => {
+	try {
+		const [result] = await pool.query(
+			`INSERT INTO products(name, brand, description, image_url, price, stock_quantity, available) 
+			VALUES(?, ?, ?, ?, ?, ?, ?)`,
+			[
+				name,
+				brand,
+				description,
+				image_url,
+				price,
+				stock_quantity,
+				available,
+			],
+		);
+		return result.insertId ? await getProductById(result.insertId) : null;
+	} catch (err) {
+		throw err;
+	}
+};
+
 //Update the stock quantity
 export const updateProductQuantityById = async (key, value, product_id) => {
 	try {
@@ -54,10 +83,10 @@ export const updateProductQuantityById = async (key, value, product_id) => {
 export const updateProductAvailabilityById = async (value, product_id) => {
 	try {
 		const column = pool.escapeId(key);
-		await pool.execute(
-			`UPDATE products SET available = ? WHERE id =?`,
-			[value, product_id],
-		);
+		await pool.execute(`UPDATE products SET available = ? WHERE id =?`, [
+			value,
+			product_id,
+		]);
 		return await getProductById(product_id);
 	} catch (err) {
 		throw err;

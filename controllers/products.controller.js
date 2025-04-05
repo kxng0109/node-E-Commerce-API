@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import validator from "validator";
-import { getProduct, getProductById, getProducts } from "../db/products.db.js";
-import { BadRequestError, NotFoundError } from "../errors/index.js";
+import { createProduct, getProduct, getProductById, getProducts } from "../db/products.db.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../errors/index.js";
 import sendSuccess from "../utils/response.util.js";
 
 //Get all products
@@ -41,5 +41,27 @@ export const viewProduct = async(req, res, next) =>{
 		sendSuccess(res, StatusCodes.OK, "Successfully retrieved product.", {product})
 	}catch(err){
 		next(err)
+	}
+}
+
+export const addProduct = async(req, res, next) =>{
+	try{
+		const { name, brand, description, image_url, price, stock_quantity, available} = req.body;
+		const {role} = req.user;
+		if(role !== "admin"){
+			throw new ForbiddenError("You don't have permission to access this route.");
+		}
+
+		if(!name || !brand || !description || !image_url || !price || !stock_quantity || !available){
+			throw new BadRequestError("Required fields can't be empty or non-existent.")
+		}
+
+		const product = await createProduct(name, brand, description, image_url, price, stock_quantity, available);
+		if(!product){
+			throw new Error("Error occured while creating product.")
+		}
+		sendSuccess(res, StatusCodes.CREATED, "Product added to database.", {product});
+	}catch(err){
+		next(err);
 	}
 }

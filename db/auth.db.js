@@ -23,11 +23,11 @@ export const findUserByID = async (id) => {
 	}
 };
 
-export const registerUser = async (firstName, lastName, email, password) => {
+export const registerUser = async (firstName, lastName, email, password, role) => {
 	try {
 		const [result] = await pool.execute(
-			"INSERT INTO users(email, password, first_name, last_name) VALUES(?, ?, ?, ?)",
-			[email, password, firstName, lastName],
+			"INSERT INTO users(email, password, first_name, last_name, role) VALUES(?, ?, ?, ?, ?)",
+			[email, password, firstName, lastName, role],
 		);
 		return findUserByID(result.insertId);
 	} catch (err) {

@@ -22,8 +22,8 @@ export const loginController = async (req, res, next) => {
 			throw new BadRequestError("Incorrect credentials.");
 		}
 
-		const { id, first_name, last_name, email } = userDetails;
-		const token = await generateJWT({ id, first_name, last_name, email });
+		const { id, first_name, last_name, email, role } = userDetails;
+		const token = await generateJWT({ id, first_name, last_name, email, role });
 
 		sendSuccess(res, StatusCodes.OK, `Welcome ${first_name}`, {token});
 	} catch (err) {
@@ -33,7 +33,7 @@ export const loginController = async (req, res, next) => {
 
 export const registerController = async (req, res, next) => {
 	try {
-		const { email, password, first_name, last_name, emailExists } =
+		const { email, password, first_name, last_name, emailExists, role } =
 			req.user; //Gotten from the validateRegister middleware
 
 		if (emailExists) {
@@ -46,16 +46,18 @@ export const registerController = async (req, res, next) => {
 			last_name,
 			email,
 			hashedPassword,
+			role
 		);
 
 		const { id } = user;
-		const token = await generateJWT({ id, first_name, last_name, email });
+		const token = await generateJWT({ id, first_name, last_name, email, role });
+		console.log(token, role)
 
 		sendSuccess(
 			res,
 			StatusCodes.CREATED,
 			`Registeration successful. Welcome ${last_name} ${first_name}.`,
-			token,
+			{token},
 		);
 	} catch (err) {
 		next(err);

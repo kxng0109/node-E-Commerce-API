@@ -7,6 +7,7 @@ const pool = createPool({
 	user: process.env.MYSQL_USER,
 	password: process.env.MYSQL_PASSWORD,
 	database: "e_commerce",
+	supportBigNumbers: true
 });
 
 if (!process.env.MYSQL_HOST || !process.env.MYSQL_USER) {

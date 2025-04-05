@@ -1,7 +1,24 @@
+import { config } from "dotenv-safe";
+import { createPool } from "mysql2/promise";
 import pool from "./db/dbConnect.js";
+config();
 
 (async () => {
+	const {MYSQL_HOST, MYSQL_PASSWORD, MYSQL_USER} = process.env;
 	try {
+		//Used to create the database if it doesn't exists
+		const rootPool = createPool({
+			host: MYSQL_HOST,
+			user: MYSQL_USER,
+			password: MYSQL_PASSWORD,
+			supportBigNumbers: true,
+			connectionLimit: 5
+		});
+
+		await rootPool.query("CREATE DATABASE IF NOT EXISTS e_commerce");
+		console.log("Database is ready.")
+		await rootPool.end();
+
 		const queries = [
 			`
 			CREATE TABLE IF NOT EXISTS users (

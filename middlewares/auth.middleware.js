@@ -18,8 +18,8 @@ const authMiddleware = async (req, res, next) => {
 			const decoded = jwt.verify(token, process.env.JWT_SECRET, {
 				algorithms: "HS384",
 			});
-			const { id, email } = decoded;
-			req.user = { ...req.user, id, email };
+			const { id, email, role } = decoded;
+			req.user = { ...req.user, id, email, role };
 			next();
 		} catch (err) {
 			throw new UnauthorizedError(
