@@ -16,6 +16,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 		err.message.includes("Table")
 	) {
 		return res.status(StatusCodes.NOT_FOUND).json({
+			success: false,
 			message: "Table does not exist in database.",
 			errCode: StatusCodes.NOT_FOUND,
 		});
