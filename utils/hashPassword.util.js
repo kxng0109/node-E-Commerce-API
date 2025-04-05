@@ -9,7 +9,7 @@ const hashPassword = async(rawPassword) =>{
 		const hashedPassword = await hash(rawPassword, saltRounds);
 		return hashedPassword;
 	} catch(err){
-		throw new Error(err)
+		throw err;
 	}
 };
 

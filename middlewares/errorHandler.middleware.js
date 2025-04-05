@@ -3,9 +3,11 @@ import { CustomError } from "../errors/index.js";
 
 const errorHandlerMiddleware = (err, req, res, next) => {
 	if (err instanceof CustomError) {
-		return res
-			.status(err.statusCode)
-			.json({ message: err.message, errCode: err.statusCode });
+		return res.status(err.statusCode).json({
+			success: false,
+			message: err.message,
+			errCode: err.statusCode,
+		});
 	}
 
 	console.error(err);
@@ -20,7 +22,11 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 	}
 	return res
 		.status(StatusCodes.INTERNAL_SERVER_ERROR)
-		.json({ message: "An error occured." });
+		.json({
+			success: false,
+			message: "An error occured.",
+			errCode: StatusCodes.INTERNAL_SERVER_ERROR,
+		});
 };
 
 export default errorHandlerMiddleware;

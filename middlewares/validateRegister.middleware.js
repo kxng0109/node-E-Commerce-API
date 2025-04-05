@@ -1,5 +1,5 @@
 import validator from "validator";
-import { BadRequestError } from "../errors/index.js";
+import { BadRequestError, UnprocessableEntityError } from "../errors/index.js";
 
 const validateRegister = async (req, res, next) => {
 	try {
@@ -12,6 +12,10 @@ const validateRegister = async (req, res, next) => {
 			throw new BadRequestError(
 				"Password can not be less than eight(8) characters.",
 			);
+		}
+
+		if(!validator.isStrongPassword(password)){
+			throw new UnprocessableEntityError("Password must contain at least one uppercase letter, one lowercase letter, one symbol and must not be less than eight (8) characters");
 		}
 
 		if (!validator.isAlpha(first_name) || !validator.isAlpha(last_name)) {
