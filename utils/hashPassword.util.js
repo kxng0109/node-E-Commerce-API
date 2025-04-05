@@ -1,5 +1,5 @@
 import { hash } from "bcrypt";
-import { config } from "dotenv";
+import { config } from "dotenv-safe";
 config();
 
 const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 12;

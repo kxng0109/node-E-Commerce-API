@@ -1,4 +1,4 @@
-import { config } from "dotenv";
+import { config } from "dotenv-safe";
 import { createPool } from "mysql2/promise";
 config();
 

@@ -1,6 +1,7 @@
-import { config } from "dotenv";
+import { config } from "dotenv-safe";
 import Stripe from "stripe";
 import { getProducts } from "../db/products.db.js";
+import BadRequestError from "../errors/bad-request.error.js";
 
 config();
 
@@ -8,6 +9,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const stripe_base_url = "https://api.stripe.com";
 
 const handlePayout = async (cart, user_id) => {
+	if(!cart || !cart.length){
+		throw new BadRequestError("Nothing in cart.")
+	};
 	const products = await getProducts();
 	const productsMap = new Map();
 	products.map((item) => {

@@ -1,0 +1,327 @@
+openapi: 3.0.0
+info:
+  title: E-Commerce API
+  contact: {}
+  version: '1.0'
+servers:
+- url: http://localhost:3000/api/v1
+  variables: {}
+paths:
+  /products:
+    get:
+      tags:
+      - Products
+      summary: Get all Products
+      description: Fetch all products in the database.
+      operationId: GetallProducts
+      parameters: []
+      responses:
+        '200':
+          description: 'Prouct fetch successful.'
+          headers: {}
+        '404':
+            description: "No product found in database or table does not exist."
+      deprecated: false
+      security: []
+  /product/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: The product ID
+    get:
+      tags:
+      - Products
+      summary: Get specific product
+      operationId: Getspecificproduct
+      parameters: []
+      responses:
+        '200':
+          description: 'Product found.'
+          headers: {}
+        '400':
+          description: "Product name required."
+          headers: {}
+        '404':
+          description: "Product not found in database or table does not exist."
+          headers: {}
+      deprecated: false
+  /cart:
+    post:
+      tags:
+      - Cart
+      summary: Add to cart
+      operationId: Addtocart
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/AddtocartRequest'
+              - example:
+                  product_id: 2
+                  quantity: 3
+            example:
+              product_id: 2
+              quantity: 3
+        required: true
+      responses:
+        '201':
+          description: 'Product added to cart. '
+          headers: {}
+        '400':
+          description : "Invalid parameter or product already exists in your cart.  "
+        '404':
+          description : "Product not found."
+      deprecated: false
+      security:
+      - bearer: []
+    get:
+      tags:
+      - Cart
+      summary: Check cart
+      operationId: Checkcart
+      parameters: []
+      responses:
+        '200':
+          description: 'Fetched Cart successfully.'
+          headers: {}
+        '404':
+          description : "You don't have a cart."
+      deprecated: false
+      security:
+      - bearer: []
+    delete:
+      tags:
+      - Cart
+      summary: Delete cart
+      operationId: Deletecart
+      parameters: []
+      responses:
+        '200':
+          description: 'Cart deleted'
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login User
+      description: Login user.
+      operationId: LoginUser
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/LoginUserRequest'
+              - example:
+                  email: test@gmail.com
+                  password: random123
+            example:
+              email: test@gmail.com
+              password: random123
+        required: true
+      responses:
+        '200':
+          description: 'Log in successful. '
+          headers: {}
+        '400':
+          description: "Incorrect credentials. "
+        '404':
+          description : "User with this email not found."
+      deprecated: false
+      security: []
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register User
+      description: Register the user.
+      operationId: RegisterUser
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/RegisterUserRequest'
+              - example:
+                  email: test2@gmail.com
+                  password: random123
+                  first_name: Michael
+                  last_name: Jackson
+            example:
+              email: test2@gmail.com
+              password: random123
+              first_name: Michael
+              last_name: Jackson
+        required: true
+      responses:
+        '201':
+          description: 'Registeration successful.'
+          headers: {}
+        '400':
+          description: "Invalid parameters."
+        '409':
+          description: "User with this email exists."
+      deprecated: false
+      security: []
+  /cart/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: The product ID
+    patch:
+      tags:
+      - Cart
+      summary: Update cart
+      operationId: Updatecart
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/UpdatecartRequest'
+              - example:
+                  quantity: 1
+            example:
+              quantity: 1
+        required: true
+      responses:
+        '200':
+          description: 'Updated Item in cart.'
+          headers: {}
+        '400':
+          description: "Invalid parameters."
+        '404':
+          description: "Product does not exists or product is not in your cart."
+      deprecated: false
+      security:
+      - bearer: []
+    delete:
+      tags:
+      - Cart
+      summary: Delete item from cart
+      operationId: Deleteitemfromcart
+      parameters: []
+      responses:
+        '200':
+          description: 'Deleted Item in cart.'
+          headers: {}
+        '400':
+          description: "Invalid parameters."
+        '404':
+          description: "Product does not exists or product is not in your cart."
+      deprecated: false
+      security:
+      - bearer: []
+  /cart/checkout:
+    post:
+      tags:
+      - Checkout
+      summary: Checkout
+      operationId: Checkout
+      parameters: []
+      responses:
+        '200':
+          description: 'Return session url.'
+          headers: {}
+        '400':
+          description: "Nithing in cart."
+      deprecated: false
+      security:
+      - bearer: []
+components:
+  schemas:
+    LoginUserRequest:
+      title: LoginUserRequest
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: test@gmail.com
+        password: random123
+    RegisterUserRequest:
+      title: RegisterUserRequest
+      required:
+      - email
+      - password
+      - first_name
+      - last_name
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+      example:
+        email: test2@gmail.com
+        password: random123
+        first_name: Michael
+        last_name: Jackson
+    AddtocartRequest:
+      title: AddtocartRequest
+      required:
+      - product_id
+      - quantity
+      type: object
+      properties:
+        product_id:
+          type: integer
+          format: int32
+        quantity:
+          type: integer
+          format: int32
+      example:
+        product_id: 2
+        quantity: 3
+    UpdatecartRequest:
+      title: UpdatecartRequest
+      required:
+      - quantity
+      type: object
+      properties:
+        quantity:
+          type: integer
+          format: int32
+      example:
+        quantity: 1
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+- name: Products
+  description: ''
+- name: Auth
+  description: ''
+- name: Cart
+  description: ''
+- name: Checkout
+  description: ''

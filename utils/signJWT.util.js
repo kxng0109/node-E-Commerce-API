@@ -1,4 +1,4 @@
-import { config } from "dotenv";
+import { config } from "dotenv-safe";
 import jwt from "jsonwebtoken";
 config();
 

@@ -1,4 +1,4 @@
-import { config } from "dotenv";
+import { config } from "dotenv-safe";
 import Stripe from "stripe";
 import { clearCart, getUserCart } from "../db/cart.db.js";
 import { UnauthorizedError } from "../errors/index.js";

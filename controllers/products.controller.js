@@ -6,6 +6,9 @@ import { BadRequestError, NotFoundError } from "../errors/index.js";
 export const viewProducts = async(req, res, next) =>{
 	try{
 		const products = await getProducts();
+		if(!products || !products.length){
+			throw new NotFoundError("No products found in the database.")
+		}
 		res.status(StatusCodes.OK).json(products)
 	}catch(err){
 		next(err);
