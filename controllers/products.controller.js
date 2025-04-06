@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import validator from "validator";
-import { createProduct, getProduct, getProductById, getProducts } from "../db/products.db.js";
-import { BadRequestError, ForbiddenError, NotFoundError } from "../errors/index.js";
+import { createProduct, deleteProductById, getProduct, getProductById, getProductByNameAndBrand, getProducts, updateProductById } from "../db/products.db.js";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../errors/index.js";
 import sendSuccess from "../utils/response.util.js";
 
 //Get all products
@@ -47,21 +47,51 @@ export const viewProduct = async(req, res, next) =>{
 export const addProduct = async(req, res, next) =>{
 	try{
 		const { name, brand, description, image_url, price, stock_quantity, available} = req.body;
-		const {role} = req.user;
-		if(role !== "admin"){
-			throw new ForbiddenError("You don't have permission to access this route.");
-		}
 
 		if(!name || !brand || !description || !image_url || !price || !stock_quantity || !available){
 			throw new BadRequestError("Required fields can't be empty or non-existent.")
 		}
+		const images = JSON.stringify(image_url);
 
-		const product = await createProduct(name, brand, description, image_url, price, stock_quantity, available);
-		if(!product){
+		const product = await getProductByNameAndBrand(name, brand);
+
+		if(product && product.name == name && product.brand == brand){
+			throw new ConflictError("Product exists in the database.")
+		}
+
+		const newProduct = await createProduct(name, brand, description, images, price, stock_quantity, available);
+		if(!newProduct){
 			throw new Error("Error occured while creating product.")
 		}
-		sendSuccess(res, StatusCodes.CREATED, "Product added to database.", {product});
+		sendSuccess(res, StatusCodes.CREATED, "Product added to database.", {newProduct});
 	}catch(err){
 		next(err);
+	}
+}
+
+export const updateProduct = async(req, res, next) =>{
+	try{
+		const {productID} = req.user;
+		const product = await updateProductById(req.body, productID);
+		if(!product){
+			throw new Error("Issue dey o!!")
+		}
+		sendSuccess(res, StatusCodes.OK, "Product updated Successfully.", {product})
+	}catch(err){
+		next(err)
+	}
+}
+
+export const deleteProduct = async(req, res, next) =>{
+	try{
+		const { productID } = req.user;
+		if(!productID){
+			throw new BadRequestError("Product ID needed.")
+		}
+
+		const products = await deleteProductById(productID);
+		sendSuccess(res, StatusCodes.OK, "Product removed from database.", {products});
+	}catch(err){
+		next(err)
 	}
 }

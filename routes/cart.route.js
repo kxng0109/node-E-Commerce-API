@@ -10,6 +10,7 @@ import checkOutController from "../controllers/checkout.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import checkProductExistsMiddleware from "../middlewares/checkProductExists.middleware.js";
 import compareQuantity from "../middlewares/compareQuantity.middleware.js";
+import validateCartItem from "../middlewares/validateCartItem.middleware.js";
 
 const router = Router();
 router.use(authMiddleware);
@@ -17,12 +18,22 @@ router.use(authMiddleware);
 router
 	.route("/")
 	.get(getCartItemsController)
-	.post(checkProductExistsMiddleware, compareQuantity, addToCartController)
+	.post(
+		validateCartItem,
+		checkProductExistsMiddleware,
+		compareQuantity,
+		addToCartController,
+	)
 	.delete(clearCartController);
 
 router
 	.route("/:productID")
-	.patch(checkProductExistsMiddleware, compareQuantity, updateCartController)
+	.patch(
+		validateCartItem,
+		checkProductExistsMiddleware,
+		compareQuantity,
+		updateCartController,
+	)
 	.delete(deleteFromCartController);
 
 router.post("/checkout", checkOutController);
