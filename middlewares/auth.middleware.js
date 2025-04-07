@@ -6,7 +6,7 @@ const authMiddleware = async (req, res, next) => {
 	try {
 		let authHeader = req.headers.authorization;
 		if (!authHeader || !authHeader.startsWith("Bearer ")) {
-			throw new BadRequestError("No token provided. ");
+			throw new UnauthorizedError("No token provided.");
 		}
 
 		const token = authHeader.split(" ")[1];

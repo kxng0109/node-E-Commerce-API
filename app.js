@@ -14,7 +14,6 @@ import webhookRoute from "./routes/webhook.route.js";
 config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 app.use(helmet());
 app.use(cors());
 app.use(
@@ -41,6 +40,4 @@ app.use("/api/v1/cart", cartRoute);
 
 app.use(errorHandlerMiddleware);
 
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
-});
+export default app;

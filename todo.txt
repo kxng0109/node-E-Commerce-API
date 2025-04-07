@@ -1,0 +1,5 @@
+- When the user changes the quantity to 0, remove the product fromth e cart entirely
+- Middleware that converts product names to their id
+- Redo the structure of folders, I'm seeing something like models and config
+- Maybe async wrapper
+- We didn't add the details about the stripe cli stuff

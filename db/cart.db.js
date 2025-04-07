@@ -1,3 +1,4 @@
+import BadRequestError from "../errors/bad-request.error.js";
 import pool from "./dbConnect.js";
 
 const checkTable = async () => {
@@ -79,10 +80,13 @@ export const updateItemInCart = async (user_id, product_id, quantity) => {
 //Delete an item from the user cart
 export const deleteFromCart = async (product_id, user_id) => {
 	try {
-		await pool.execute(
+		const [result] = await pool.execute(
 			"DELETE FROM cart_items WHERE product_id = ? AND user_id = ?",
 			[product_id, user_id],
 		);
+		if(!result.affectedRows){
+			throw new BadRequestError(`Product with id ${product_id} not found.`)
+		}
 		const rows = await getUserCart(user_id);
 		return rows;
 	} catch (err) {

@@ -7,7 +7,7 @@ import {
     getUserCart,
     updateItemInCart,
 } from "../db/cart.db.js";
-import { BadRequestError, NotFoundError } from "../errors/index.js";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors/index.js";
 import checkProductExists from "../utils/checkProductExists.util.js";
 import sendSuccess from "../utils/response.util.js";
 
@@ -17,7 +17,7 @@ export const getCartItemsController = async (req, res, next) => {
 
 		const cart = await getUserCart(user_id);
 		if (!cart) {
-			throw new NotFoundError("There is nothing in your cart.");
+			return sendSuccess(res, StatusCodes.OK, "There is nothing in your cart.")
 		}
 
 		sendSuccess(res, StatusCodes.OK, "Cart retrieved successfully", {cart})
@@ -39,7 +39,7 @@ export const addToCartController = async (req, res, next) => {
 			const cart = await addItemToCart(user_id, product_id, quantity);
 			sendSuccess(res, StatusCodes.CREATED, "Product added to cart.", cart)
 		} else {
-			throw new BadRequestError("Product exists in your cart.");
+			throw new ConflictError("Product exists in your cart.");
 		}
 	} catch (err) {
 		next(err);

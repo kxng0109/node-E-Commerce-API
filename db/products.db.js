@@ -59,7 +59,7 @@ export const createProduct = async (
 	available,
 ) => {
 	try {
-		const [result] = await pool.query(
+		const [result] = await pool.execute(
 			`INSERT INTO products(name, brand, description, image_url, price, stock_quantity, available) 
 			VALUES(?, ?, ?, ?, ?, ?, ?)`,
 			[

@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import { registerUser } from "../db/auth.db.js";
 import {
-    BadRequestError,
     ConflictError,
     NotFoundError,
+    UnauthorizedError,
 } from "../errors/index.js";
 import comparePassword from "../utils/comaprePassword.util.js";
 import hashPassword from "../utils/hashPassword.util.js";
@@ -19,13 +19,19 @@ export const loginController = async (req, res, next) => {
 
 		const match = await comparePassword(password, userDetails.password);
 		if (!match) {
-			throw new BadRequestError("Incorrect credentials.");
+			throw new UnauthorizedError("Incorrect credentials.");
 		}
 
 		const { id, first_name, last_name, email, role } = userDetails;
-		const token = await generateJWT({ id, first_name, last_name, email, role });
+		const token = await generateJWT({
+			id,
+			first_name,
+			last_name,
+			email,
+			role,
+		});
 
-		sendSuccess(res, StatusCodes.OK, `Welcome ${first_name}`, {token});
+		sendSuccess(res, StatusCodes.OK, `Welcome ${first_name}`, { token });
 	} catch (err) {
 		next(err);
 	}
@@ -46,18 +52,25 @@ export const registerController = async (req, res, next) => {
 			last_name,
 			email,
 			hashedPassword,
-			role
+			role,
 		);
 
 		const { id } = user;
-		const token = await generateJWT({ id, first_name, last_name, email, role });
-		console.log(token, role)
+		const token = await generateJWT({
+			id,
+			first_name,
+			last_name,
+			email,
+			role,
+		});
+		const name =
+			first_name && last_name ? `${last_name} ${first_name}` : "user";
 
 		sendSuccess(
 			res,
 			StatusCodes.CREATED,
-			`Registeration successful. Welcome ${last_name} ${first_name}.`,
-			{token},
+			`Registeration successful. Welcome ${name}.`,
+			{ token },
 		);
 	} catch (err) {
 		next(err);

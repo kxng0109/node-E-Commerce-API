@@ -1,26 +1,23 @@
 openapi: 3.0.0
 info:
-  title: E-Commerce API
+  title: E-commerce API
   contact: {}
-  version: '1.0'
+  version: "1.0"
 servers:
-- url: http://localhost:3000/api/v1
-  variables: {}
+  - url: http://localhost:3000/api/v1
+    variables: {}
 paths:
   /products:
     get:
       tags:
-      - Products
+        - Product
       summary: Get all Products
-      description: Fetch all products in the database.
       operationId: GetallProducts
       parameters: []
       responses:
-        '200':
-          description: 'Prouct fetch successful.'
+        "200":
+          description: "Log in successful"
           headers: {}
-        '404':
-            description: "No product found in database or table does not exist."
       deprecated: false
       security: []
   /product/{id}:
@@ -33,149 +30,295 @@ paths:
         description: The product ID
     get:
       tags:
-      - Products
+        - Product
       summary: Get specific product
       operationId: Getspecificproduct
       parameters: []
       responses:
-        '200':
-          description: 'Product found.'
+        "200":
+          description: "Successful fetched from database."
           headers: {}
-        '400':
+        "400":
           description: "Product name required."
           headers: {}
-        '404':
-          description: "Product not found in database or table does not exist."
+        "404":
+          description: "Product not found."
           headers: {}
       deprecated: false
-  /cart:
-    post:
+    delete:
       tags:
-      - Cart
-      summary: Add to cart
-      operationId: Addtocart
+        - Product
+      summary: Delete Product
+      operationId: DeleteProduct
+      parameters: []
+      responses:
+        "200":
+          description: "Product successfully removed from the database."
+          headers: {}
+        "400":
+          description: "Invalid token or product does not exist."
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+      deprecated: false
+      security:
+        - bearer: []
+    patch:
+      tags:
+        - Product
+      summary: Update product
+      operationId: Updateproduct
       parameters: []
       requestBody:
-        description: ''
+        description: ""
         content:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/AddtocartRequest'
-              - example:
-                  product_id: 2
-                  quantity: 3
+                - $ref: "#/components/schemas/UpdateproductRequest"
+                - example:
+                    name: boby
+                    price: 456.75
+                    stock_quantity: 99
             example:
-              product_id: 2
-              quantity: 3
+              name: boby
+              price: 456.75
+              stock_quantity: 99
         required: true
       responses:
-        '201':
-          description: 'Product added to cart. '
+        "200":
+          description: "Product updated successfully."
           headers: {}
-        '400':
-          description : "Invalid parameter or product already exists in your cart.  "
-        '404':
-          description : "Product not found."
+        "400":
+          description: "Invalid token or product does not exist."
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
       deprecated: false
       security:
-      - bearer: []
-    get:
+        - bearer: []
+  /product:
+    post:
       tags:
-      - Cart
-      summary: Check cart
-      operationId: Checkcart
-      parameters: []
+        - Product
+      summary: Create product
+      operationId: Createproduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - brand
+                - description
+                - available
+                - stock_quantity
+                - price
+                - image_url
+              properties:
+                name:
+                  type: string
+                  example: "A test name"
+                brand:
+                  type: string
+                  example: "A brand name"
+                description:
+                  type: string
+                  example: "A product description"
+                available:
+                  type: string
+                  enum: [yes, no]
+                  example: "yes"
+                stock_quantity:
+                  type: integer
+                  minimum: 0
+                  example: 5
+                price:
+                  type: number
+                  format: float
+                  example: 9999.99
+                image_url:
+                  type: array
+                  items:
+                    type: string
+                    format: url
       responses:
-        '200':
-          description: 'Fetched Cart successfully.'
+        "200":
+          description: "Product added to database."
           headers: {}
-        '404':
-          description : "You don't have a cart."
+        "400":
+          description: "Invalid token"
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+        "409":
+          description: "Product already exists in the database."
       deprecated: false
       security:
-      - bearer: []
-    delete:
-      tags:
-      - Cart
-      summary: Delete cart
-      operationId: Deletecart
-      parameters: []
-      responses:
-        '200':
-          description: 'Cart deleted'
-          headers: {}
-      deprecated: false
-      security:
-      - bearer: []
+        - bearer: []
   /auth/login:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Login User
-      description: Login user.
       operationId: LoginUser
       parameters: []
       requestBody:
-        description: ''
+        description: ""
         content:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/LoginUserRequest'
-              - example:
-                  email: test@gmail.com
-                  password: random123
+                - $ref: "#/components/schemas/LoginUserRequest"
+                - example:
+                    email: test@gmail.com
+                    password: randoM@123
             example:
               email: test@gmail.com
-              password: random123
+              password: randoM@123
         required: true
       responses:
-        '200':
-          description: 'Log in successful. '
-          headers: {}
-        '400':
-          description: "Incorrect credentials. "
-        '404':
-          description : "User with this email not found."
+        "200":
+          description: "Login successful."
+          headers:
+            Authorization:
+              description: |
+                JSON Web Token to be used for authenticated requests.
+                Send this value in your `Authorization: Bearer <token>` header.
+              schema:
+                type: string
+        "400":
+          description: "Invalid token."
+        "401":
+          description: "Incorrect credentials."
+        "404":
+          description: "User not found."
       deprecated: false
       security: []
   /auth/register:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Register User
-      description: Register the user.
       operationId: RegisterUser
       parameters: []
       requestBody:
-        description: ''
+        description: ""
         content:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/RegisterUserRequest'
-              - example:
-                  email: test2@gmail.com
-                  password: random123
-                  first_name: Michael
-                  last_name: Jackson
+                - $ref: "#/components/schemas/RegisterUserRequest"
+                - example:
+                    email: test1@gmail.com
+                    password: randoM@123
+                    first_name: Michael
+                    last_name: Jackson
+                    role: admin
             example:
-              email: test2@gmail.com
-              password: random123
+              email: test1@gmail.com
+              password: randoM@123
               first_name: Michael
               last_name: Jackson
+              role: admin
         required: true
       responses:
-        '201':
-          description: 'Registeration successful.'
-          headers: {}
-        '400':
-          description: "Invalid parameters."
-        '409':
-          description: "User with this email exists."
+        "200":
+          description: "Registration successful."
+          headers:
+            Authorization:
+              description: |
+                JSON Web Token to be used for authenticated requests.
+                Send this value in your `Authorization: Bearer <token>` header.
+              schema:
+                type: string
+        "400":
+          description: "Invalid token."
+        "409":
+          description: "User exists"
       deprecated: false
       security: []
+  /cart:
+    get:
+      tags:
+        - Cart
+      summary: Get cart
+      operationId: Getcart
+      parameters: []
+      responses:
+        "200":
+          description: "Cart retrieved successfully."
+          headers: {}
+        "400":
+          description: "Invalid token."
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+      deprecated: false
+      security:
+        - bearer: []
+    post:
+      tags:
+        - Cart
+      summary: Add to cart
+      operationId: Addtocart
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/AddtocartRequest"
+                - example:
+                    product_id: 2
+                    quantity: 3
+            example:
+              product_id: 2
+              quantity: 3
+        required: true
+      responses:
+        "201":
+          description: "Product added to cart."
+          headers: {}
+        "400":
+          description: "Invalid token or product ID and quantity must be valid and present."
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+        "404":
+          description: "Product with such ID can't be found."
+        "409":
+          description: "Product exist in your cart already."
+        "422":
+          description: "Product is out of stock."
+      deprecated: false
+      security:
+        - bearer: []
+    delete:
+      tags:
+        - Cart
+      summary: Delete cart
+      operationId: Deletecart
+      parameters: []
+      responses:
+        "200":
+          description: "Cart cleared"
+          headers: {}
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+      deprecated: false
+      security:
+        - bearer: []
   /cart/{id}:
     parameters:
       - in: path
@@ -186,73 +329,83 @@ paths:
         description: The product ID
     patch:
       tags:
-      - Cart
+        - Cart
       summary: Update cart
       operationId: Updatecart
       parameters: []
       requestBody:
-        description: ''
+        description: ""
         content:
           application/json:
             schema:
               allOf:
-              - $ref: '#/components/schemas/UpdatecartRequest'
-              - example:
-                  quantity: 1
+                - $ref: "#/components/schemas/UpdatecartRequest"
+                - example:
+                    quantity: 1
             example:
               quantity: 1
         required: true
       responses:
-        '200':
-          description: 'Updated Item in cart.'
+        "200":
+          description: "Cart successfully updated."
           headers: {}
-        '400':
-          description: "Invalid parameters."
-        '404':
-          description: "Product does not exists or product is not in your cart."
+        "400":
+          description: "Invalid token or product ID and quantity must be valid and present."
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+        "404":
+          description: "Product with such ID can't be found or it doesn't exist in your cart."
+        "409":
+          description: "Product exist in your cart already."
+        "422":
+          description: "Quantity is greater than available stock or the product is now out of stock."
       deprecated: false
       security:
-      - bearer: []
+        - bearer: []
     delete:
       tags:
-      - Cart
+        - Cart
       summary: Delete item from cart
       operationId: Deleteitemfromcart
       parameters: []
       responses:
-        '200':
-          description: 'Deleted Item in cart.'
+        "200":
+          description: "Product removed from cart."
           headers: {}
-        '400':
-          description: "Invalid parameters."
-        '404':
-          description: "Product does not exists or product is not in your cart."
+        "400":
+          description: "Invalid token or product ID must be valid and present."
+        "401":
+          description: "No token."
+        "403":
+          description: "You don't have the permssions to access this route."
+        "404":
+          description: "Product with such ID can't be found in database or cart."
       deprecated: false
       security:
-      - bearer: []
+        - bearer: []
   /cart/checkout:
     post:
       tags:
-      - Checkout
+        - Cart
       summary: Checkout
       operationId: Checkout
       parameters: []
       responses:
-        '200':
-          description: 'Return session url.'
+        "200":
+          description: "Checkout url generated."
           headers: {}
-        '400':
-          description: "Nithing in cart."
       deprecated: false
       security:
-      - bearer: []
+        - bearer: []
 components:
   schemas:
     LoginUserRequest:
       title: LoginUserRequest
       required:
-      - email
-      - password
+        - email
+        - password
       type: object
       properties:
         email:
@@ -265,10 +418,11 @@ components:
     RegisterUserRequest:
       title: RegisterUserRequest
       required:
-      - email
-      - password
-      - first_name
-      - last_name
+        - email
+        - password
+        - first_name
+        - last_name
+        - role
       type: object
       properties:
         email:
@@ -279,16 +433,19 @@ components:
           type: string
         last_name:
           type: string
+        role:
+          type: string
       example:
-        email: test2@gmail.com
-        password: random123
+        email: test1@gmail.com
+        password: randoM@123
         first_name: Michael
         last_name: Jackson
+        role: admin
     AddtocartRequest:
       title: AddtocartRequest
       required:
-      - product_id
-      - quantity
+        - product_id
+        - quantity
       type: object
       properties:
         product_id:
@@ -303,7 +460,7 @@ components:
     UpdatecartRequest:
       title: UpdatecartRequest
       required:
-      - quantity
+        - quantity
       type: object
       properties:
         quantity:
@@ -311,17 +468,35 @@ components:
           format: int32
       example:
         quantity: 1
+    UpdateproductRequest:
+      title: UpdateproductRequest
+      required:
+        - name
+        - price
+        - stock_quantity
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        stock_quantity:
+          type: integer
+          format: int32
+      example:
+        name: "Egg"
+        price: 456.75
+        stock_quantity: 99
   securitySchemes:
     bearer:
       type: http
       scheme: bearer
+      bearerFormat: JWT
 security: []
 tags:
-- name: Products
-  description: ''
-- name: Auth
-  description: ''
-- name: Cart
-  description: ''
-- name: Checkout
-  description: ''
+  - name: Product
+    description: ""
+  - name: Auth
+    description: ""
+  - name: Cart
+    description: ""

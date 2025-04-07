@@ -9,7 +9,7 @@ export const viewProducts = async(req, res, next) =>{
 	try{
 		const products = await getProducts();
 		if(!products || !products.length){
-			throw new NotFoundError("No products found in the database.")
+			return sendSuccess(res, StatusCodes.OK, "No products found in the database.")
 		}
 		sendSuccess(res, StatusCodes.OK, "Successfully retrieved products", {products})
 	}catch(err){
@@ -25,10 +25,6 @@ export const viewProduct = async(req, res, next) =>{
 			throw new BadRequestError("Product name required.")
 		};
 
-		if(!validator.isAlphanumeric(productName)){
-			throw new BadRequestError("Product name must be an alphabet or a number indicating its id");
-		}
-
 		let product;
 		if(Number.isNaN(Number(productName))){
 			product = await getProduct(productName);
@@ -36,7 +32,7 @@ export const viewProduct = async(req, res, next) =>{
 			product = await getProductById(productName);
 		}
 		if(!product){
-			throw new NotFoundError("Product with such name not found.")
+			throw new NotFoundError("Product with such name or ID not found.")
 		}
 		sendSuccess(res, StatusCodes.OK, "Successfully retrieved product.", {product})
 	}catch(err){
@@ -72,10 +68,11 @@ export const addProduct = async(req, res, next) =>{
 export const updateProduct = async(req, res, next) =>{
 	try{
 		const {productID} = req.user;
-		const product = await updateProductById(req.body, productID);
-		if(!product){
-			throw new Error("Issue dey o!!")
+		if(!productID){
+			throw new BadRequestError("Product ID needed.")
 		}
+		const product = await updateProductById(req.body, productID);
+
 		sendSuccess(res, StatusCodes.OK, "Product updated Successfully.", {product})
 	}catch(err){
 		next(err)

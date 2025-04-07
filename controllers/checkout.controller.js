@@ -1,6 +1,8 @@
+import { StatusCodes } from "http-status-codes";
 import { getUserCart } from "../db/cart.db.js";
 import BadRequestError from "../errors/bad-request.error.js";
 import handlePayout from "../services/stripe.service.js";
+import sendSuccess from "../utils/response.util.js";
 
 const checkOutController = async (req, res, next) => {
 	try {
@@ -10,7 +12,11 @@ const checkOutController = async (req, res, next) => {
 		}
 		const cart = await getUserCart(user_id);
 		const session = await handlePayout(cart, user_id);
-		res.send(session.url);
+		sendSuccess(res, StatusCodes.OK, "Checkout URL generated.", {
+			checkoutURL: session.url,
+			sessionID: session.id,
+			expiresAt: session.expires_at,
+		});
 	} catch (err) {
 		next(err);
 	}
