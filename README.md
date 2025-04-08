@@ -22,6 +22,7 @@ A **RESTful E-Commerce API** built with Node.js and Express, featuring user auth
 - [Error Handling](#error-handling)
 - [Security & Middleware](#-security--middleware)
 - [Project Structure](#project-structure)
+- [Testing](#testing)
 - [License](#license)
 - [Contact](#contact)
 
@@ -30,34 +31,34 @@ A **RESTful E-Commerce API** built with Node.js and Express, featuring user auth
 ## 🔥 Features
 
 - **User Auth**:  
-  - Register & Login with JWT  
-  - Bcrypt password hashing  
-  - Role‑based (`customer` / `admin`) access control  
+  - Register & Login with JWT.
+  - Bcrypt password hashing.
+  - Role‑based (`customer` / `admin`) access control.  
 - **Product Management**:  
-  - CRUD for products (admin only)  
-  - JSON field for multiple image URLs  
-  - Inventory tracking  
+  - CRUD for products (Product creation and deletion routes are protected and require a valid admin JWT token).  
+  - JSON field for multiple image URLs.
+  - Inventory tracking.
 - **Cart System**:  
-  - Add / update / remove items  
-  - Composite unique constraint on `(user_id, product_id)`  
+  - Add, update, remove, and clear cart items per user.
+  - Composite unique constraint on `(user_id, product_id)`.
 - **Payments**:  
-  - Stripe Checkout with dynamic line items  
-  - Backend‑only flow via webhooks (`payment_intent.succeeded`)  
+  - Secure checkout sessions and webhook handling. 
+  - Backend‑only flow via webhooks (`payment_intent.succeeded`).
 - **API Docs**:  
-  - OpenAPI (Swagger) spec in `swagger.yaml`  
-  - Interactive UI via Swagger‑UI  
+  - OpenAPI (Swagger) spec in `swagger.yaml`.
+  - Interactive UI via Swagger‑UI.
 - **Error Handling**:  
-  - Custom error classes (400, 401, 404, 409, 500)  
-  - Centralized error‑handling middleware  
+  - Custom error classes (400, 401, 403, 404, 409, 422, 500).
+  - Centralized error‑handling middleware.
 - **Security**:  
-  - HTTP headers via Helmet  
-  - CORS, rate limiting, HPP, XSS cleaning  
-  - Env var validation (dotenv‑safe compatible)  
+  - HTTP headers via Helmet.
+  - CORS, rate limiting, HPP.
+  - Environment variable validation (dotenv‑safe compatible).
 
 ---
 ## Tech Stack
 
-- **Runtime**: Node.js (v14+)
+- **Runtime**: Node.js (v16+)
 - **Framework**: Express.js
 - **Database**: MySQL (via `mysql2`)
 - **Authentication**: JSON Web Tokens (`jsonwebtoken`)
@@ -66,6 +67,7 @@ A **RESTful E-Commerce API** built with Node.js and Express, featuring user auth
 - **Environment**: `dotenv-safe`
 - **Payment Processing**: Stripe SDK
 - **API Docs**: Swagger UI & YAML
+- **Testing**: Jest
 
 ---
 
@@ -107,6 +109,16 @@ A **RESTful E-Commerce API** built with Node.js and Express, featuring user auth
 
 2. Open `.env` and set the variables.
 
+3. Stripe CLI for Webhooks
+To test webhooks locally, use the Stripe CLI:
+First navigate [here](https://docs.stripe.com/stripe-cli?install-method=homebrew#install) to install the stripe CLI and also to login.
+After a successful login, run:
+	  ```bash
+	  stripe listen --forward-to localhost:<PORT>/api/checkout/webhook
+	  ```
+	  Replace `<PORT>` with port number set in your `.env`.
+Alternatively, you can configure a webhook endpoint in the Stripe Dashboard by setting the endpoint URL to <SERVER_URL>/api/checkout/webhook.
+
 ---
 
 ## Database Setup
@@ -129,7 +141,7 @@ You can also inspect or modify the SQL schema in `setupDatabases.js`.
 
 ## Running the App
 
-### Development (with nodemon)
+### Development
 
 ```bash
 npm run dev
@@ -177,6 +189,11 @@ For detailed request and response schemas for all endpoints, please navigate to 
 
 - `GET /api/v1/products` - Get all products
 - `GET /api/v1/product/:id` - Get a single product by ID
+- `POST /api/product` - Create a new product (Admin only)
+- `PATCH /api/product/:id` - Update a product (Admin only)
+- `DELETE /api/product/:id` - Delete a product (Admin only)
+
+> **Note**: These routes (`POST /api/product`, `PATCH /api/product/:id` and `DELETE /api/product/:id`) require a valid JWT token with an admin role. Access is controlled via the user’s role embedded in the token; no separate admin route is needed.
 
 ### Cart
 
@@ -216,10 +233,9 @@ We use:
 - **Helmet** – secure HTTP headers  
 - **CORS** – restrict origins to your front‑end  
 - **express-rate-limit** – brute‑force protection  
-- **hpp** – HTTP parameter pollution  
-- **xss-clean** – sanitize user input  
-- **express-validator** – request validation  
-- **JWT** – stateless auth  
+- **hpp** – HTTP parameter pollution
+- **validator** – request validation  
+- **JWT** – stateless auth
 - **Stripe Webhook Signature** – verify events
 
 ---
@@ -235,6 +251,7 @@ node-E-Commerce-API/
 ├── services/             # Contains stripe service
 ├── db/                   # Database queries and interactions
 ├── routes/               # Route definitions and bindings
+├── tests/               # Test suites written with Jest
 ├── utils/                # Utility/helper functions
 ├── setupDatabases.js     # DB setup script
 ├── app.js                # Express app setup
@@ -245,9 +262,22 @@ node-E-Commerce-API/
 
 ---
 
+## Testing
+
+The project now includes a comprehensive test suite written with Jest. All tests are located in the `tests/` directory and cover the functionality of controllers, routes, and utility functions.
+
+### Run Tests
+
+```bash
+npm test
+# or
+yarn test
+```
+---
+
 ## License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**. See the [LICENSE](/LICENSE) file for details.
 
 ---
 
